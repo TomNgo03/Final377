@@ -1,30 +1,6 @@
+mod tsh;
+use tsh::SimpleShell;
 use std::io::{self, Write};
-use std::process::Command;
-
-struct SimpleShell;
-
-impl SimpleShell {
-    fn new() -> SimpleShell {
-        return SimpleShell
-    }
-
-    fn parse_command(&self, cmd: &str) -> Vec<String> {
-        return cmd.split_whitespace().map(String::from).collect()
-    }
-
-    fn exec_command(&self, argv: &[String]) {
-        match Command::new(&argv[0])
-            .args(&argv[1..])
-            .status() {
-            Ok(_) => {},
-            Err(e) => eprintln!("Command Failed: {}", e),
-        }
-    }
-
-    fn is_quit(&self, cmd: &str) -> bool {
-        return cmd == "quit"
-    }
-}
 
 fn main() {
     let shell = SimpleShell::new();
