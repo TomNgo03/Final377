@@ -1,4 +1,5 @@
 use std::process::{Command, exit};
+use core::str::from_utf8;
 
 pub struct SimpleShell;
 
@@ -45,4 +46,54 @@ impl SimpleShell {
     pub fn is_quit(&self, cmd: &str) -> bool {
         return cmd == "quit"
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_is_quit(){
+        let mut shell = SimpleShell::new();
+        assert_eq!(shell.is_quit("quit"), true);
+        assert_eq!(shell.is_quit("ls"), false);
+    }
+    
+    #[test]
+    fn test_parse_command() {
+        let shell = SimpleShell::new();
+
+        let argv = shell.parse_command("echo Hello, World!");
+        assert_eq!(argv, vec!["echo", "Hello,", "World!"]);
+
+        let argv = shell.parse_command("echo -n Hello, World!");
+        assert_eq!(argv, vec!["echo", "-n", "Hello,", "World!"]);
+    }
+
+    #[test]
+    fn test_exec_command() {
+        let shell = SimpleShell::new();
+    
+        // Test command execution
+        let cmd = shell.parse_command("echo Hello, World!");
+        let output = shell.exec_command(&cmd).unwrap();
+        assert_eq!(from_utf8(&output.stdout).unwrap().trim(), "Hello, World!");
+        assert!(output.status.success());
+    
+        // Test command with arguments
+        let cmd = shell.parse_command("echo -n Hello, World!");
+        let output = shell.exec_command(&cmd).unwrap();
+        assert_eq!(from_utf8(&output.stdout).unwrap(), "Hello, World!");
+        assert!(output.status.success());
+    }
+
+    #[test]
+    fn test_cd_command() {
+        let shell = SimpleShell::new();
+        let argv = shell.parse_command("cd /tmp");
+        let output = shell.exec_command(&argv).unwrap();
+        assert!(output.status.success());
+        assert_eq!(from_utf8(&output.stdout).unwrap().trim(), "/tmp");
+    }
+
 }
