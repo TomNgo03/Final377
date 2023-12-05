@@ -22,7 +22,7 @@ impl SimpleShell {
         match &argv[0][..] {
              //if it's cd, we use std::env::set_current_dir, to change the directory
             "cd" => {
-                if argv.len() > 1 {
+                if argv.len() == 2 {
                     //set_current_dir returns a result so we match and provide options in case of success/failure
                     match std::env::set_current_dir(&argv[1][..]) { 
                         Ok(_) => print!("{} ", std::env::current_dir().unwrap().display()),
@@ -32,8 +32,7 @@ impl SimpleShell {
             },
             _ => { //if it's any other command, we use Command::new() which is basically fork and exec
                 match Command::new(&argv[0]) //&argv[0] is the name of the command
-                    .args(&argv[1..]) //&argv[1..] is the rest of the arguments which serve as the arguments to the command
-                    .spawn()
+                    .args(&argv[1..]).spawn() //&argv[1..] is the rest of the arguments which serve as the arguments to the command
                 {
                     //if the new() was succsesful, we wait for the child
                     Ok(mut child) => { 
@@ -43,10 +42,12 @@ impl SimpleShell {
                                     exit(1);
                                 }
                             }
-                            Err(e) => eprintln!("Failed to wait for command: {}", e),
+                            Err(e) => eprintln!("Failed to wait for 
+command: {}", e),
                         }
                     }
-                    Err(e) => eprintln!("Failed to execute command: {}", e),
+                    Err(e) => eprintln!("Failed to execute command: {}", 
+e),
                 }
             },  
         }
@@ -55,5 +56,31 @@ impl SimpleShell {
     //just checking if the provided command is "quit"
     pub fn is_quit(&self, cmd: &str) -> bool {
         return cmd == "quit"
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn test_is_quit() {
+        let tsh = SimpleShell::new();
+        assert!(tsh.is_quit("quit"));
+        assert!(!tsh.is_quit("ls"));
+    }
+    #[test]
+    fn test_parse_command() {
+        let tsh = SimpleShell::new();
+        let argv = tsh.parse_command("echo cs377 is amazing");
+        assert_eq!(argv, vec!["echo", "cs377", "is", "amazing"]);
+    }
+
+    #[test]
+    fn test_cd() {
+        let tsh = SimpleShell::new();
+        let argv = tsh.parse_command("cd /tmp");
+        tsh.exec_command(&argv);
+        //.display() formats the output of unwrap() of the current directory so that we can use to_string() on it to compare
+        assert_eq!(std::env::current_dir().unwrap().display().to_string(), "/tmp");
     }
 }
