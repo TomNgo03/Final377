@@ -90,6 +90,11 @@ mod tests {
     use std::env;
 
     #[test]
+    fn test_new() {
+        let tsh = SimpleShell::new();
+    }
+
+    #[test]
     fn test_is_quit() {
         let tsh = SimpleShell::new();
         assert!(tsh.is_quit("quit"), "quit is not quit");
