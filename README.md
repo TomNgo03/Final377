@@ -12,3 +12,7 @@ The code has inline documentation explaining all the non-obvious parts of the co
 2. Run `cargo build`
 3. To run the application run `cargo run`
 4. To run the tests run `cargo test`
+
+
+## Useful Links for submission
+1. https://github.com/TomNgo03/Final377
