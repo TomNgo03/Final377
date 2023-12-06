@@ -20,7 +20,7 @@ fn main() {
                     break;
                 }
 
-                shell.exec_command(&cmd_tokens);
+                let _ = shell.exec_command(&cmd_tokens);
             }
         } else {
             println!("Error recieving input");
